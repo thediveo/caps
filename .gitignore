@@ -1,0 +1,5 @@
+coverage.out
+coverage-root.out
+coverage.html
+__debug_bin
+*.log
