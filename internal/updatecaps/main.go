@@ -48,7 +48,7 @@ const capabilityDefinitionsFile = "libcap/include/uapi/linux/capability.h"
 const capabilitiesGoFile = "capabilities.go"
 
 // Grabs only the lines in form of "#define CAP_NAME 123" together with their
-// preceeding comment(s).
+// preceding comment(s).
 var capabilityDefinition = regexp.MustCompile(`(?m)^((?:/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\n)+)\n#define (CAP_[A-Z0-9_]+)\s+(\d+)$`)
 
 // Removes the in-comment "*" line beginnings that mess up the godoc rendering

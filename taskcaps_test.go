@@ -28,7 +28,7 @@ import (
 
 var _ = Describe("task capabilities", func() {
 
-	It("returns an error when asking capabilites of a non-existing task", func() {
+	It("returns an error when asking capabilities of a non-existing task", func() {
 		Expect(OfTask(-1)).Error().To(MatchError(syscall.EINVAL))
 	})
 
