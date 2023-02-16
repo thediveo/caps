@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"golang.org/x/exp/slices"
 )
@@ -111,6 +112,40 @@ func (c CapabilitiesSet) Names() []string {
 		}
 	}
 	return names
+}
+
+// SortedNames returns the names of the capabilities in this set in
+// lexicographic order, but with "anonymous" capabilities (CAP_ddd) always
+// sorted last.
+func (c CapabilitiesSet) SortedNames() []string {
+	names := c.Names()
+	slices.SortFunc(names, lessCapName)
+	return names
+}
+
+// lessCapName orders capability names lexicographically, but with "anonymous"
+// capability names coming only after all known capability names.
+func lessCapName(a, b string) bool {
+	unknownA := isAnonymousCapability(a)
+	unknownB := isAnonymousCapability(b)
+	if unknownA != unknownB {
+		return unknownB
+	}
+	return a < b
+}
+
+// isAnonymousCapability returns true if the specified (uppercase) capability
+// name is an unknown capability in the form of "CAP_" followed only by digits.
+func isAnonymousCapability(name string) bool {
+	if !strings.HasPrefix(name, "CAP_") {
+		return false
+	}
+	for idx := len("CAP_"); idx < len(name); idx++ {
+		if !unicode.IsDigit(rune(name[idx])) {
+			return false
+		}
+	}
+	return true
 }
 
 // String returns a textual representation of the capabilities in this set,

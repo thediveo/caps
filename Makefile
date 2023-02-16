@@ -14,6 +14,9 @@ pkgsite: ## serves Go documentation on port 6060
 	@echo "navigate to: http://localhost:6060/github.com/thediveo/caps"
 	@scripts/pkgsite.sh
 
+refresh: ## checks for a newer version of libcap and updates the definitions if necessary
+	go generate .
+
 test: ## runs all tests
 	go test -exec sudo -v -p 1 -count 1 ./... && go test -v -p 1 -count 1 ./...
 

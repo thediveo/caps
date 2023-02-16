@@ -3,7 +3,7 @@
 [![PkgGoDev](https://img.shields.io/badge/-reference-blue?logo=go&logoColor=white&labelColor=505050)](https://pkg.go.dev/github.com/thediveo/caps)
 [![License](https://img.shields.io/github/license/thediveo/caps)](https://img.shields.io/github/license/thediveo/caps)
 ![Build and Test](https://github.com/thediveo/caps/workflows/build%20and%20test/badge.svg?branch=master)
-![Coverage](https://img.shields.io/badge/Coverage-96.2%25-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-96.6%25-brightgreen)
 [![Go Report Card](https://goreportcard.com/badge/github.com/thediveo/caps)](https://goreportcard.com/report/github.com/thediveo/caps)
 
 A pure-Go minimalist package for getting and setting the capabilities of Linux

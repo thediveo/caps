@@ -104,6 +104,8 @@ const (
 	CAP_IPC_LOCK = 14
 	/* Override IPC ownership checks */
 	CAP_IPC_OWNER = 15
+	/* Insert and remove kernel modules - modify kernel without limit */
+	CAP_SYS_MODULE = 16
 	/* Allow ioperm/iopl access
 
 	Allow sending USB messages to any device via /dev/bus/usb */
@@ -312,6 +314,7 @@ var CapabilityNameByNumber = map[int]string{
 	13: "CAP_NET_RAW",
 	14: "CAP_IPC_LOCK",
 	15: "CAP_IPC_OWNER",
+	16: "CAP_SYS_MODULE",
 	17: "CAP_SYS_RAWIO",
 	18: "CAP_SYS_CHROOT",
 	19: "CAP_SYS_PTRACE",

@@ -25,6 +25,34 @@ import (
 
 var _ = Describe("capabilities sets", func() {
 
+	It("has no capability gaps", func() {
+		for capno := 0; capno <= MaxCapabilityNumber; capno++ {
+			Expect(CapabilityNameByNumber).To(HaveKey(capno))
+		}
+	})
+
+	DescribeTable("anonymous capabilities",
+		func(name string, isAnonymous bool) {
+			Expect(isAnonymousCapability(name)).To(Equal(isAnonymous))
+		},
+		Entry(nil, "8BALL", false),
+		Entry(nil, "CAP_FOO_BAR", false),
+		Entry(nil, "CAP_8BALL", false),
+		Entry(nil, "CAP_666", true),
+	)
+
+	DescribeTable("sorting capabilities",
+		func(a, b string, isLess bool) {
+			Expect(lessCapName(a, b)).To(Equal(isLess))
+		},
+		Entry(nil, "CAP_FOO_BAR", "CAP_ZOO", true),
+		Entry(nil, "CAP_FOO_BAR", "CAP_BAR", false),
+		Entry(nil, "CAP_FOO_BAR", "CAP_42", true),
+		Entry(nil, "CAP_42", "CAP_FOO", false),
+		Entry(nil, "CAP_42", "CAP_88", true),
+		Entry(nil, "CAP_100", "CAP_99", true), // sic!
+	)
+
 	It("sets all capabilities", func() {
 		max := LastCapability()
 		Expect(max).NotTo(BeZero())
@@ -94,6 +122,13 @@ var _ = Describe("capabilities sets", func() {
 		caps := NewCapabilitiesSet()
 		caps.Add(CAP_NET_ADMIN, CAP_SYS_ADMIN, CAP_SYS_CHROOT)
 		Expect(caps.String()).To(Equal("CAP_NET_ADMIN, CAP_SYS_ADMIN, CAP_SYS_CHROOT"))
+
+		caps.Add(MaxCapabilityNumber + 1)
+		Expect(caps.SortedNames()).To(ConsistOf(
+			"CAP_NET_ADMIN",
+			"CAP_SYS_ADMIN",
+			"CAP_SYS_CHROOT",
+			fmt.Sprintf("CAP_%d", MaxCapabilityNumber+1)))
 	})
 
 	It("returns correct hexadecimal representation", func() {
