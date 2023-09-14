@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestComposerDecorator(t *testing.T) {
+func TestCapsError(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "cap/errno package")
+	RunSpecs(t, "caps/errno package")
 }

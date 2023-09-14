@@ -20,7 +20,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/thediveo/caps/test/success"
+	. "github.com/thediveo/success"
 )
 
 var _ = Describe("capabilities sets", func() {
@@ -42,15 +42,16 @@ var _ = Describe("capabilities sets", func() {
 	)
 
 	DescribeTable("sorting capabilities",
-		func(a, b string, isLess bool) {
-			Expect(lessCapName(a, b)).To(Equal(isLess))
+		func(a, b string, order int) {
+			Expect(lessCapName(a, b)).To(Equal(order))
 		},
-		Entry(nil, "CAP_FOO_BAR", "CAP_ZOO", true),
-		Entry(nil, "CAP_FOO_BAR", "CAP_BAR", false),
-		Entry(nil, "CAP_FOO_BAR", "CAP_42", true),
-		Entry(nil, "CAP_42", "CAP_FOO", false),
-		Entry(nil, "CAP_42", "CAP_88", true),
-		Entry(nil, "CAP_100", "CAP_99", true), // sic!
+		Entry(nil, "CAP_FOO_BAR", "CAP_ZOO", -1),
+		Entry(nil, "CAP_FOO_BAR", "CAP_BAR", 1),
+		Entry(nil, "CAP_FOO_BAR", "CAP_42", -1),
+		Entry(nil, "CAP_42", "CAP_FOO", 1),
+		Entry(nil, "CAP_42", "CAP_88", -1),
+		Entry(nil, "CAP_42", "CAP_42", 0),
+		Entry(nil, "CAP_100", "CAP_99", -1), // sic!
 	)
 
 	It("sets all capabilities", func() {

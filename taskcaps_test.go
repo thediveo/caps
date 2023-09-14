@@ -20,10 +20,11 @@ import (
 	"runtime"
 	"syscall"
 
+	"golang.org/x/sys/unix"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/thediveo/caps/test/success"
-	"golang.org/x/sys/unix"
+	. "github.com/thediveo/success"
 )
 
 var _ = Describe("task capabilities", func() {

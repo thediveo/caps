@@ -128,7 +128,7 @@ func getCaps(contents string) []capability {
 			Commenting: strings.TrimSuffix(comment, "\n"),
 		})
 	}
-	slices.SortFunc(caps, func(a, b capability) bool { return a.BitNo < b.BitNo })
+	slices.SortFunc(caps, func(a, b capability) int { return a.BitNo - b.BitNo })
 	return caps
 }
 
@@ -155,7 +155,7 @@ func getSizes(contents string) []capusersize {
 			Size: size,
 		})
 	}
-	slices.SortFunc(sizes, func(a, b capusersize) bool { return a.Size < b.Size })
+	slices.SortFunc(sizes, func(a, b capusersize) int { return a.Size - b.Size })
 	return sizes
 }
 

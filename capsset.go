@@ -125,13 +125,20 @@ func (c CapabilitiesSet) SortedNames() []string {
 
 // lessCapName orders capability names lexicographically, but with "anonymous"
 // capability names coming only after all known capability names.
-func lessCapName(a, b string) bool {
+func lessCapName(a, b string) int {
 	unknownA := isAnonymousCapability(a)
 	unknownB := isAnonymousCapability(b)
 	if unknownA != unknownB {
-		return unknownB
+		// if one xor the other is an anonymous ("number") capability then we
+		// want to go the properly named cap before the number cap.
+		switch unknownA {
+		case true:
+			return 1
+		case false:
+			return -1
+		}
 	}
-	return a < b
+	return strings.Compare(a, b)
 }
 
 // isAnonymousCapability returns true if the specified (uppercase) capability
