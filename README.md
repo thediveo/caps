@@ -42,6 +42,10 @@ caps.SetForThisTask(origcaps)
 `caps` supports versions of Go that are noted by the Go release policy, that is,
 major versions _N_ and _N_-1 (where _N_ is the current major version).
 
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Copyright and License
 
 `caps` is Copyright 2023 Harald Albrecht, and licensed under the Apache License,
