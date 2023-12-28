@@ -119,13 +119,13 @@ func (c CapabilitiesSet) Names() []string {
 // sorted last.
 func (c CapabilitiesSet) SortedNames() []string {
 	names := c.Names()
-	slices.SortFunc(names, lessCapName)
+	slices.SortFunc(names, cmpCapName)
 	return names
 }
 
-// lessCapName orders capability names lexicographically, but with "anonymous"
+// cmpCapName orders capability names lexicographically, but with "anonymous"
 // capability names coming only after all known capability names.
-func lessCapName(a, b string) int {
+func cmpCapName(a, b string) int {
 	unknownA := isAnonymousCapability(a)
 	unknownB := isAnonymousCapability(b)
 	if unknownA != unknownB {

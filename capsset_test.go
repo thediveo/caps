@@ -43,7 +43,7 @@ var _ = Describe("capabilities sets", func() {
 
 	DescribeTable("sorting capabilities",
 		func(a, b string, order int) {
-			Expect(lessCapName(a, b)).To(Equal(order))
+			Expect(cmpCapName(a, b)).To(Equal(order))
 		},
 		Entry(nil, "CAP_FOO_BAR", "CAP_ZOO", -1),
 		Entry(nil, "CAP_FOO_BAR", "CAP_BAR", 1),
