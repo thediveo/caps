@@ -16,13 +16,12 @@
 
 package caps
 
+import "github.com/thediveo/nonstd/xslices"
+
 // Reverse returns a copy of the specified slice with the sequence of elements
-// reversed.
-func Reverse[S ~[]E, E any](s S) S {
-	scopy := make(S, len(s))
-	copy(scopy, s)
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		scopy[i], scopy[j] = scopy[j], scopy[i]
-	}
-	return scopy
-}
+// reversed. It differs from [slices.Reverse] in that it works on a copy and not in place.
+//
+// Deprecated: use [xslices.ReverseCopy] instead to signal copy semantics.
+//
+//go:fix inline
+func Reverse[S ~[]E, E any](s S) S { return xslices.ReverseCopy(s) }

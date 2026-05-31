@@ -3,7 +3,7 @@
 [![PkgGoDev](https://img.shields.io/badge/-reference-blue?logo=go&logoColor=white&labelColor=505050)](https://pkg.go.dev/github.com/thediveo/caps)
 [![License](https://img.shields.io/github/license/thediveo/caps)](https://img.shields.io/github/license/thediveo/caps)
 ![Build and Test](https://github.com/thediveo/caps/actions/workflows/buildandtest.yaml/badge.svg?branch=master)
-![Coverage](https://img.shields.io/badge/Coverage-96.6%25-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-96.5%25-brightgreen)
 [![Go Report Card](https://goreportcard.com/badge/github.com/thediveo/caps)](https://goreportcard.com/report/github.com/thediveo/caps)
 
 A pure-Go minimalist package for getting and setting the capabilities of Linux
@@ -48,9 +48,9 @@ caps.SetForThisTask(origcaps)
 > Volume~~" command, as it is utterly broken by design, ignoring
 > `.devcontainer/devcontainer.json`.
 
-1. `git clone https://github.com/thediveo/enumflag`
+1. `git clone https://github.com/thediveo/caps`
 2. in VSCode: Ctrl+Shift+P, "Dev Containers: Open Workspace in Container..."
-3. select `enumflag.code-workspace` and off you go...
+3. select `caps.code-workspace` and off you go...
 
 ## Supported Go Versions
 
@@ -64,5 +64,5 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Copyright and License
 
-`caps` is Copyright 2023, 2025 Harald Albrecht, and licensed under the Apache
+`caps` is Copyright 2023, 2026 Harald Albrecht, and licensed under the Apache
 License, Version 2.0.

@@ -22,8 +22,9 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/thediveo/caps/errno"
 	"golang.org/x/sys/unix"
+
+	"github.com/thediveo/caps/errno"
 )
 
 // TaskCapabilities represents the effective, permitted and inheritable
@@ -152,19 +153,19 @@ func OfTask(tid int) (taskcaps TaskCapabilities, err error) {
 	}
 
 	caps := CapabilitiesSet(make([]uint32, capDataElements))
-	for idx := 0; idx < capDataElements; idx++ {
+	for idx := range capDataElements {
 		caps[idx] = capData[idx].Effective
 	}
 	taskcaps.Effective = caps
 
 	caps = CapabilitiesSet(make([]uint32, capDataElements))
-	for idx := 0; idx < capDataElements; idx++ {
+	for idx := range capDataElements {
 		caps[idx] = capData[idx].Permitted
 	}
 	taskcaps.Permitted = caps
 
 	caps = CapabilitiesSet(make([]uint32, capDataElements))
-	for idx := 0; idx < capDataElements; idx++ {
+	for idx := range capDataElements {
 		caps[idx] = capData[idx].Inheritable
 	}
 	taskcaps.Inheritable = caps

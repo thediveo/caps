@@ -19,11 +19,10 @@ package caps
 import (
 	"encoding/hex"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
-
-	"golang.org/x/exp/slices"
 )
 
 // CapabilitiesSet is a set of capabilities.
@@ -44,7 +43,7 @@ func NewCapabilitiesSet() CapabilitiesSet {
 func AllCapabilities() CapabilitiesSet {
 	maxindex, maxbitno := wordBitIndices(lastCapability)
 	c := make(CapabilitiesSet, maxindex+1)
-	for idx := 0; idx < maxindex; idx++ {
+	for idx := range maxindex {
 		c[idx] = ^uint32(0)
 	}
 	c[maxindex] = ^uint32(0) >> (31 - maxbitno)
