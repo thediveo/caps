@@ -78,7 +78,7 @@ var _ = Describe("capabilities sets", func() {
 	It("drops dropped caps without enlarging the set", func() {
 		caps := NewCapabilitiesSet()
 		caps.Drop(CAP_SYS_ADMIN)
-		Expect(caps).To(HaveLen(0))
+		Expect(caps).To(BeEmpty())
 	})
 
 	It("clears all capabilities", func() {

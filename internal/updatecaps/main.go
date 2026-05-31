@@ -27,6 +27,7 @@ import (
 	"io/fs"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"text/template"
@@ -34,7 +35,6 @@ import (
 
 	"github.com/thediveo/gitrepofs"
 	"github.com/thediveo/gitrepofs/version"
-	"golang.org/x/exp/slices"
 	"golang.org/x/mod/semver"
 )
 
@@ -213,7 +213,7 @@ func ownSemVer() string {
 					if !ok {
 						continue
 					}
-					ver := strings.Replace(val.Value, `"`, "", -1)
+					ver := strings.ReplaceAll(val.Value, `"`, "")
 					fmt.Printf("current cap capabilities version: %s\n", ver)
 					return ver
 				}
@@ -237,7 +237,8 @@ func main() {
 	fmt.Printf("latest release: %s\n", latestSemVer)
 
 	currentSemVer := ownSemVer()
-	if !(len(os.Args) >= 2 && os.Args[1] == "force") && semver.Compare("v"+currentSemVer, "v"+latestSemVer) >= 0 {
+	if !(len(os.Args) >= 2 && os.Args[1] == "force") && //nolint:staticcheck // not demorgan every morning
+		semver.Compare("v"+currentSemVer, "v"+latestSemVer) >= 0 {
 		fmt.Printf("%s already up to date\n", capabilitiesGoFile)
 		os.Exit(0)
 	}

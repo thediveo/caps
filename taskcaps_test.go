@@ -60,7 +60,7 @@ var _ = Describe("task capabilities", func() {
 			By("regaining CAP_NET_RAW before creating a raw socket")
 			powerless.Effective.Add(CAP_NET_RAW)
 			Expect(SetForThisTask(powerless)).To(Succeed())
-			unix.Close(Successful(unix.Socket(unix.AF_INET, unix.SOCK_RAW, 254)))
+			Expect(unix.Close(Successful(unix.Socket(unix.AF_INET, unix.SOCK_RAW, 254)))).To(Succeed())
 		}()
 		Eventually(done).Should(BeClosed())
 	})

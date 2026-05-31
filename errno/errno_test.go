@@ -35,7 +35,7 @@ var _ = Describe("boxed errno error values", func() {
 	)
 
 	It("returns nil for errno 0", func() {
-		Expect(Error(0)).To(BeNil())
+		Expect(Error(0)).To(Succeed())
 	})
 
 	It("returns the errno as error", func() {
