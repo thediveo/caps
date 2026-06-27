@@ -1,7 +1,7 @@
 {
     "name": "caps",
     "portsAttributes": {
-        "16061": {
+        "6060": {
             "label": "caps package documentation",
             "onAutoForward": "notify",
             "protocol": "http"
@@ -11,11 +11,9 @@
     "features": {
         "ghcr.io/devcontainers/features/node:2": {},
         "ghcr.io/devcontainers/features/go:1": {},
-        "ghcr.io/thediveo/devcontainer-features/local-pkgsite:1": {
-            "port": "16061"
-        },
         "ghcr.io/thediveo/devcontainer-features/goreportcard:1": {},
         "ghcr.io/thediveo/devcontainer-features/go-mod-upgrade:1": {},
+        "ghcr.io/thediveo/devcontainer-features/pinact:0": {},
         "ghcr.io/thediveo/devcontainer-features/lazygit:0": {},
         "ghcr.io/thediveo/devcontainer-features/gocover:1": {
             "root": true,
@@ -24,7 +22,9 @@
             "verbose": true,
             "html": true
         },
-        "ghcr.io/thediveo/devcontainer-features/pinact:0": {}
+        "ghcr.io/thediveo/devcontainer-features/local-pkgsite:1": {
+            "port": "6060"
+        }
     },
     "capAdd": [
         "SYS_ADMIN"
