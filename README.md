@@ -3,8 +3,7 @@
 [![PkgGoDev](https://img.shields.io/badge/-reference-blue?logo=go&logoColor=white&labelColor=505050)](https://pkg.go.dev/github.com/thediveo/caps)
 [![License](https://img.shields.io/github/license/thediveo/caps)](https://img.shields.io/github/license/thediveo/caps)
 ![Build and Test](https://github.com/thediveo/caps/actions/workflows/buildandtest.yaml/badge.svg?branch=master)
-![Coverage](https://img.shields.io/badge/Coverage-96.5%25-brightgreen)
-[![Go Report Card](https://goreportcard.com/badge/github.com/thediveo/caps)](https://goreportcard.com/report/github.com/thediveo/caps)
+![Coverage](https://img.shields.io/badge/Coverage-98.9%25-brightgreen)
 
 A pure-Go minimalist package for getting and setting the capabilities of Linux
 tasks (threads). No need for linking with `libcap`.
@@ -18,26 +17,22 @@ To drop the calling task's effective capabilities only, without dropping the
 permitted capabilities:
 
 ```go
-// Make sure to lock this Go routine to its current OS-level task (thread).
-runtime.LockOSThread()
+import "github.com/thediveo/caps/v2"
 
-origcaps := caps.OfThisTask()
-dropped := origcaps.Clone()
-dropped.Effective.Clear()
-caps.SetForThisTask(dropped)
-```
+func foo() {
+    // Make sure to lock this Go routine to its current OS-level task (thread).
+    runtime.LockOSThread()
 
-To regain only a specific effective capability:
+    origcaps := caps.OfCurrentTaskOrZero()
+    dropped, _ = origcaps.Effective().Clear().ApplyToCurrentTask()
+    ```
 
-```go
-dropped.Effective.Add(caps.CAP_SYS_ADMIN)
-caps.SetForThisTask(dropped)
-```
+    // To regain only a specific effective capability:
+    _, _ = dropped.Effective().Add(caps.CAP_SYS_ADMIN).ApplyToCurrentTask()
 
-And finally to regain all originally effective capabilities:
-
-```go
-caps.SetForThisTask(origcaps)
+    // And finally to regain all originally effective capabilities:
+    _, _ = origcaps.ApplyToCurrentTask()
+}
 ```
 
 ## DevContainer

@@ -1,4 +1,4 @@
-// Copyright 2023 Harald Albrecht.
+// Copyright 2026 Harald Albrecht.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -12,18 +12,23 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-package caps
+package caps_test
 
 import (
+	"github.com/thediveo/caps/v2"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("reversing slices", func() {
+var _ = Describe("detecting capabilities API behavior", func() {
 
-	It("reverses slices", func() {
-		Expect(Reverse([]rune{'H', 'E', 'L', 'O'})).To(Equal([]rune{'O', 'L', 'E', 'H'}))
-		Expect(Reverse([]rune{'H', 'E', 'L', 'l', 'O'})).To(Equal([]rune{'O', 'l', 'L', 'E', 'H'}))
+	It("reports a non-zero capability version from this kernel", func() {
+		Expect(caps.KernelCapabilityVersion()).NotTo(BeZero())
+	})
+
+	It("reports a non-zero last capability as reported by the kernel", func() {
+		Expect(caps.LastCapability()).NotTo(BeZero())
 	})
 
 })

@@ -1,12 +1,34 @@
 /*
 Package caps provides a minimalist interface to getting and setting the
 capabilities of Linux tasks (threads). It is a pure Go implementation that does
-not need any linking with the [C libcap]. However, it isn't any drop-in
-replacement for the [libcap.git] Go module (if that even is possible).
+not need any linking with the [C libcap]. On purpose, this package isn't any
+drop-in replacement for the [libcap.git] Go module (if that even is possible).
 
 The focus of this module is on dropping and regaining effective capabilities, as
-well as dropping permitted capabilities. That is, a more Go-like API to
+well as dropping permitted capabilities. That is, a more Go-like fluent API to
 the [capget(2)] and capset(2) Linux syscalls.
+
+# Migrating v0 → v2: Capabilities are Immutable Values
+
+caps v2 treats both individual capabilities sets (in form of [CapabilitiesSet])
+as well as task capabilities triplets (that is, the [TaskCapabilities] type) as
+immutable. This in turn naturally leads to a fluent chaining API: instead of
+returning the modified original CapabilitiesSet or TaskCapabilities, chain
+methods always return a new immutable object for the new state, keeping the old
+object immutable.
+
+Unless in the hottest of hot paths, we consider immutability to be significantly
+more important than “ludicrous speed”, as immutability decreases the chance of
+hard-to-track unintended shared state modifications at a slightly increased GC
+cost. Please see below for usage examples.
+
+In case of [TaskCapabilities] the three chain methods
+[TaskCapabilities.Effective], [TaskCapabilities.Permitted] and
+[TaskCapabilities.Inheritable] tell the following modification methods (such as
+[SpotlightedCapabilities.Add], [SpotlightedCapabilities.Drop], et cetera) which
+capabilities of the triple set to modify. Please note that it's not possible to
+modify the same capability in two or more sets simultaneously, which hardly
+should be a real use case under any circumstances.
 
 # Dropping and Regaining Effective Capabilities
 
@@ -15,20 +37,18 @@ permitted capabilities:
 
 	// Make sure to lock this Go routine to its current OS-level task (thread).
 	runtime.LockOSThread()
+	origcaps, err := caps.OfThisTask()
+	dropped, err := origcaps.Effective().Clear().ApplyToThisTask()
 
-	origcaps := caps.OfThisTask()
-	dropped := origcaps.Clone()
-	dropped.Effective.Clear()
-	caps.SetForThisTask(dropped)
+To regain only a specific effective capability (the first returned value is the
+applied capabilities triple set itself):
 
-To regain only a specific effective capability:
+	_, err = dropped.Effective().Add(caps.CAP_SYS_ADMIN).ApplyToThisTask()
 
-	dropped.Effective.Add(caps.CAP_SYS_ADMIN)
-	caps.SetForThisTask(dropped)
+And finally to regain all originally effective capabilities (again, the first
+returned value it the applied capabilities triple set itself):
 
-And finally to regain all originally effective capabilities:
-
-	caps.SetForThisTask(origcaps)
+	_, err = origcaps.ApplyToThisTask()
 
 # Notes
 

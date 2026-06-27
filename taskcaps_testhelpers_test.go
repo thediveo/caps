@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build linux
-
 package caps
 
-import "github.com/thediveo/nonstd/xslices"
-
-// Reverse returns a copy of the specified slice with the sequence of elements
-// reversed. It differs from [slices.Reverse] in that it works on a copy and not in place.
-//
-// Deprecated: use [xslices.ReverseCopy] instead to signal copy semantics.
-//
-//go:fix inline
-func Reverse[S ~[]E, E any](s S) S { return xslices.ReverseCopy(s) }
+func (t TaskCapabilities) Eff() CapabilitiesSet  { return t.eff }
+func (t TaskCapabilities) Perm() CapabilitiesSet { return t.perm }
+func (t TaskCapabilities) Inh() CapabilitiesSet  { return t.inh }
