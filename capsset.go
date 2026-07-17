@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build linux
-
 package caps
 
 import (
@@ -23,17 +21,29 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/thediveo/nonstd/xslices"
 )
 
-// CapabilitiesSet is a set of capabilities.
+// CapabilitiesSet represents an immutable set of capabilities, such as
+// CAP_SYS_ADMIN, CAP_WORLD_DOMINATION, and so on. This is an important change
+// from the v0 CapabilitiesSet API that instead used a mutable design.
+//
+// Please note that OS-level tasks (“threads”) have multiple CapabilitiesSet
+// objects for different purposes, not least the “effective capabilities”,
+// “permitted capabilities”, and some more sets. Please refer to
+// [C(r)apabilities Illustrated] for an overview as well as more details.
 //
 // CapabilitiesSet is independent of any kernel version and its particular set
-// width. Instead, it manages capabilities in a dynamically (re)sizing set
-// (actually a slice).
+// width. Instead, it manages its capabilities in a dynamically (re)sizing set
+// (which actually a slice implementation-wise).
+//
+// [C(r)apabilities Illustrated]: https://thediveo.github.io/#/art/capabilities
 type CapabilitiesSet []uint32
 
-// NewCapabilitiesSet returns a new capabilities set. This is more of a
-// convenience for those who prefer the "New..." pattern.
+// NewCapabilitiesSet returns a new and empty capabilities set.
+//
+// This is more of a convenience for those who prefer the "New..." pattern.
 func NewCapabilitiesSet() CapabilitiesSet {
 	return CapabilitiesSet{}
 }
@@ -50,38 +60,56 @@ func AllCapabilities() CapabilitiesSet {
 	return c
 }
 
-// Clone a set of capabilities into a new and independent set.
-func (c CapabilitiesSet) Clone() CapabilitiesSet {
-	cl := make(CapabilitiesSet, len(c))
-	copy(cl, c)
-	return cl
-}
-
-// Clear clears all capabilities from this set.
-func (c *CapabilitiesSet) Clear() {
-	*c = CapabilitiesSet{}
-}
-
-// Add (set) one or more effective capabilities identified by their numbers to a set.
-func (c *CapabilitiesSet) Add(capno int, morecapnos ...int) {
+// Add returns a new capabilities set that contains all capabilities of this set
+// and additionally one or more capabilities, as identified by their numbers.
+// For instance, [CAP_SYS_ADMIN], et cetera.
+func (c CapabilitiesSet) Add(capno int, morecapnos ...int) CapabilitiesSet {
 	capnos := append([]int{capno}, morecapnos...)
+	newc := c.Clone()
 	for _, capno := range capnos {
 		wordindex, bitno := wordBitIndices(capno)
-		c.ensure(wordindex)
-		(*c)[wordindex] |= uint32(1) << bitno
+		newc.ensure(wordindex)
+		newc[wordindex] |= uint32(1) << bitno
 	}
+	return newc
 }
 
-// Drop (remove) one or more capabilities identified by their numbers to a set.
-func (c *CapabilitiesSet) Drop(capno int, morecapnos ...int) {
+// All returns a new capabilities set with all capabilities as reported by the
+// currently running kernel.
+func (c CapabilitiesSet) All() CapabilitiesSet {
+	maxindex, maxbitno := wordBitIndices(lastCapability)
+	newc := make(CapabilitiesSet, maxindex+1)
+	for idx := range maxindex {
+		newc[idx] = ^uint32(0)
+	}
+	newc[maxindex] = ^uint32(0) >> (31 - maxbitno)
+	return newc
+}
+
+// Clear returns a new capabilities set devoid of any capabilities.
+func (c CapabilitiesSet) Clear() CapabilitiesSet {
+	return CapabilitiesSet{}
+}
+
+// Clone returns a fresh and fully independent copy of the passed capabilities
+// set.
+func (c CapabilitiesSet) Clone() CapabilitiesSet {
+	return slices.Clone(c)
+}
+
+// Drop returns a new capabilities set that has one or more capabilities dropped
+// from this set, as identified by their numbers.
+func (c CapabilitiesSet) Drop(capno int, morecapnos ...int) CapabilitiesSet {
 	capnos := append([]int{capno}, morecapnos...)
+	newc := c.Clone()
 	for _, capno := range capnos {
 		wordindex, bitno := wordBitIndices(capno)
-		if wordindex >= len(*c) {
+		if wordindex >= len(newc) {
 			continue // no need to expand if the cap isn't in the set anyway.
 		}
-		(*c)[wordindex] &= ^(uint32(1) << bitno)
+		newc[wordindex] &= ^(uint32(1) << bitno)
 	}
+	return newc
 }
 
 // Has returns true if the set contains the specified capability (as identified
@@ -92,6 +120,19 @@ func (c CapabilitiesSet) Has(capno int) bool {
 		return false
 	}
 	return c[wordindex]&(uint32(1)<<bitno) != 0
+}
+
+// IsEmpty returns true if the set is devoid of any capabilities.
+func (c CapabilitiesSet) IsEmpty() bool {
+	if len(c) == 0 {
+		return true
+	}
+	for _, bits := range c {
+		if bits != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // Names returns the names of the capabilities in this set, sorted by increasing
@@ -157,9 +198,7 @@ func isAnonymousCapability(name string) bool {
 // String returns a textual representation of the capabilities in this set,
 // alphabetically sorted by capability (symbol) names.
 func (c CapabilitiesSet) String() string {
-	names := c.Names()
-	slices.Sort(names)
-	return strings.Join(names, ", ")
+	return strings.Join(xslices.SortedCopy(c.Names()), ",")
 }
 
 // Hex returns the hexadecimal representation of this capabilities set.

@@ -64,33 +64,40 @@ var _ = Describe("capabilities sets", func() {
 	})
 
 	It("adds and drops capabilities", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT, CAP_BPF)
+		caps := NewCapabilitiesSet().
+			Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT, CAP_BPF)
 		Expect(caps).To(Equal(CapabilitiesSet([]uint32{0x00240000, 0x00000080})))
-		caps.Drop(CAP_SYS_ADMIN)
+		caps = caps.Drop(CAP_SYS_ADMIN)
 		Expect(caps).To(Equal(CapabilitiesSet([]uint32{0x00040000, 0x00000080})))
-		caps.Drop(CAP_SYS_CHROOT)
+		caps = caps.Drop(CAP_SYS_CHROOT)
 		Expect(caps).To(Equal(CapabilitiesSet([]uint32{0x00000000, 0x00000080})))
-		caps.Drop(CAP_SYS_CHROOT)
+		caps = caps.Drop(CAP_SYS_CHROOT)
 		Expect(caps).To(Equal(CapabilitiesSet([]uint32{0x00000000, 0x00000080})))
 	})
 
+	When("returning modified sets, the original set is untouched", func() {
+
+		It("doesn't touch when Clone'ing", func() {
+			origcaps := NewCapabilitiesSet().Add(CAP_SYS_ADMIN)
+			caps := origcaps.Drop(CAP_SYS_ADMIN)
+			Expect(origcaps.String()).To(Equal("CAP_SYS_ADMIN"))
+			Expect(caps.String()).To(Equal(""))
+		})
+
+	})
+
 	It("drops dropped caps without enlarging the set", func() {
-		caps := NewCapabilitiesSet()
-		caps.Drop(CAP_SYS_ADMIN)
+		caps := NewCapabilitiesSet().Drop(CAP_SYS_ADMIN)
 		Expect(caps).To(BeEmpty())
 	})
 
 	It("clears all capabilities", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_SYS_ADMIN)
-		caps.Clear()
+		caps := NewCapabilitiesSet().Add(CAP_SYS_ADMIN).Clear()
 		Expect(caps.Has(CAP_SYS_ADMIN)).To(BeFalse())
 	})
 
 	It("tests capabilities", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT)
+		caps := NewCapabilitiesSet().Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT)
 		Expect(caps.Has(CAP_SYS_ADMIN)).To(BeTrue())
 		Expect(caps.Has(CAP_BPF)).To(BeFalse())
 	})
@@ -103,28 +110,37 @@ var _ = Describe("capabilities sets", func() {
 	})
 
 	It("clones a set", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT)
+		caps := NewCapabilitiesSet().Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT)
 		capsclone := caps.Clone()
 		Expect(capsclone).To(Equal(caps))
-		caps.Drop(CAP_SYS_ADMIN)
+		caps = caps.Drop(CAP_SYS_ADMIN)
 		Expect(capsclone).NotTo(Equal(caps))
 	})
 
+	DescribeTable("determines if a set is empty",
+		func(actual []uint32, expected bool) {
+			Expect(CapabilitiesSet(actual).IsEmpty()).To(Equal(expected))
+		},
+		Entry(nil, nil, true),
+		Entry(nil, []uint32{}, true),
+		Entry(nil, nil, true),
+		Entry(nil, []uint32{0, 0}, true),
+		Entry(nil, []uint32{0, 1}, false),
+	)
+
 	It("returns capability names set ordered by capability number", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT, MaxCapabilityNumber+1)
+		caps := NewCapabilitiesSet().
+			Add(CAP_SYS_ADMIN, CAP_SYS_CHROOT, MaxCapabilityNumber+1)
 		Expect(caps.Names()).To(ConsistOf([]string{
 			"CAP_SYS_ADMIN", "CAP_SYS_CHROOT", fmt.Sprintf("CAP_%d", MaxCapabilityNumber+1),
 		}))
 	})
 
 	It("returns a lexicographically sorted list of capability names", func() {
-		caps := NewCapabilitiesSet()
-		caps.Add(CAP_NET_ADMIN, CAP_SYS_ADMIN, CAP_SYS_CHROOT)
-		Expect(caps.String()).To(Equal("CAP_NET_ADMIN, CAP_SYS_ADMIN, CAP_SYS_CHROOT"))
+		caps := NewCapabilitiesSet().Add(CAP_NET_ADMIN, CAP_SYS_ADMIN, CAP_SYS_CHROOT)
+		Expect(caps.String()).To(Equal("CAP_NET_ADMIN,CAP_SYS_ADMIN,CAP_SYS_CHROOT"))
 
-		caps.Add(MaxCapabilityNumber + 1)
+		caps = caps.Add(MaxCapabilityNumber + 1)
 		Expect(caps.SortedNames()).To(ConsistOf(
 			"CAP_NET_ADMIN",
 			"CAP_SYS_ADMIN",
@@ -133,11 +149,9 @@ var _ = Describe("capabilities sets", func() {
 	})
 
 	It("returns correct hexadecimal representation", func() {
-		Expect(CapabilitiesSet{}.Hex()).To(
+		Expect(NewCapabilitiesSet().Hex()).To(
 			Equal(strings.Repeat("00000000", capDataElements)))
-		caps := CapabilitiesSet{}
-		caps.Add(CAP_SYS_ADMIN)
-		Expect(caps.Hex()).To(HaveSuffix("00200000"))
+		Expect(NewCapabilitiesSet().Add(CAP_SYS_ADMIN).Hex()).To(HaveSuffix("00200000"))
 	})
 
 	It("parses the hexadecimal capability set representation", func() {
