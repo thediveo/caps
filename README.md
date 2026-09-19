@@ -3,7 +3,7 @@
 [![PkgGoDev](https://img.shields.io/badge/-reference-blue?logo=go&logoColor=white&labelColor=505050)](https://pkg.go.dev/github.com/thediveo/caps)
 [![License](https://img.shields.io/github/license/thediveo/caps)](https://img.shields.io/github/license/thediveo/caps)
 ![Build and Test](https://github.com/thediveo/caps/actions/workflows/buildandtest.yaml/badge.svg?branch=master)
-![Coverage](https://img.shields.io/badge/Coverage-98.9%25-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-99.0%25-brightgreen)
 
 A pure-Go minimalist package for getting and setting the capabilities of Linux
 tasks (threads). No need for linking with `libcap`.
